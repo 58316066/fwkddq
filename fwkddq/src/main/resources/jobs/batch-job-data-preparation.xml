@@ -1,0 +1,66 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:batch="http://www.springframework.org/schema/batch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/batch
+		                http://www.springframework.org/schema/batch/spring-batch-3.0.xsd
+		                http://www.springframework.org/schema/beans
+		                http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+    <!--    <import resource="classpath:datasource/*.xml"/>-->
+    <import resource="classpath:spring-batch/JobLauncher.xml"/>
+    <import resource="classpath:jobs/steps/*.xml"/>
+
+    <batch:job id="Data_Preparation-10">
+        <batch:step id="data-preparation-step1" allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="reader-file" writer="write-clone-file"
+                             processor="process-clone-file" commit-interval="5"/>
+            </batch:tasklet>
+            <batch:end on="FAILED"/>
+            <batch:next on="COMPLETED" to="data-preparation-step2"/>
+        </batch:step>
+        <batch:step id="data-preparation-step2" allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="read-header-from-csv" writer="create-DDL-script"
+                             processor="replace-duplicate-column-name" commit-interval="1"/>
+            </batch:tasklet>
+            <batch:end on="FAILED"/>
+            <batch:next on="COMPLETED" to="data-preparation-step3"/>
+        </batch:step>
+        <batch:step id="data-preparation-step3" allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="readerDDLScript" writer="WriterDDL_Create_Tables"
+                             processor="change-DDL-length" commit-interval="1"/>
+            </batch:tasklet>
+            <batch:next on="COMPLETED" to="data-preparation-step4"/>
+        </batch:step>
+        <batch:step id="data-preparation-step4" allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="readCheckFileName" writer="write-File-to-table"
+                             processor="createSQL-browse-files" commit-interval="1"/>
+            </batch:tasklet>
+            <batch:next on="FAILED" to="data-preparation-step3"/>
+            <batch:end on="EXIT"/>
+            <batch:next on="COMPLETED" to="data-preparation-step5"/>
+        </batch:step>
+        <batch:step id="data-preparation-step5" allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="read-actual-length" writer="write-templatetable-to-newtable"
+                             processor="createSQL-actual-length" commit-interval="1"/>
+            </batch:tasklet>
+            <batch:end on="FAILED"/>
+            <batch:next on="SUCCESS" to="data-preparation-step1"/>
+            <batch:next on="COMPLETED" to="data-preparation-step6"/>
+        </batch:step>
+        <batch:step id="data-preparation-step6" allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="export_actual_table_0" writer="write-export-actual-table"
+                             processor="run_command_diff_file" commit-interval="1"/>
+            </batch:tasklet>
+            <batch:end on="FAILED"/>
+            <batch:end on="COMPLETED"/>
+        </batch:step>
+        <batch:listeners>
+            <batch:listener ref="data-pep-listener"/>
+        </batch:listeners>
+    </batch:job>
+</beans>

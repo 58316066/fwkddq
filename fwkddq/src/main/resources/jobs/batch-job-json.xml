@@ -1,0 +1,27 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:batch="http://www.springframework.org/schema/batch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/batch
+		                http://www.springframework.org/schema/batch/spring-batch-3.0.xsd
+		                http://www.springframework.org/schema/beans
+		                http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+    <batch:job id="job_json">
+        <batch:step id="step_job_json"  allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="readerJson" writer="itemWriterMongoJSON"
+                             processor="itemLogsProcessor" commit-interval="0"/>
+            </batch:tasklet>
+        </batch:step>
+
+<!--        <batch:step id="step_job_json2"  allow-start-if-complete="true">-->
+<!--            <batch:tasklet transaction-manager="transactionManager">-->
+<!--                <batch:chunk reader="readerMongoJson" writer="itemWriterMongoJson"-->
+<!--                             processor="ProcessJsonCompare" commit-interval="0"/>-->
+<!--            </batch:tasklet>-->
+<!--        </batch:step>-->
+
+    </batch:job>
+
+
+
+</beans>

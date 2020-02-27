@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<g-able>
+    <record>
+        <schema>batch</schema>
+        <table>BATCH_JOB_EXECUTION</table>
+    </record>
+    <record>
+        <schema>batch</schema>
+        <table>BATCH_JOB_EXECUTION_CONTEXT</table>
+    </record>
+    <record>
+        <schema>batch</schema>
+        <table>BATCH_JOB_EXECUTION_PARAMS</table>
+    </record>
+    <record>
+        <schema>batch</schema>
+        <table>BATCH_JOB_EXECUTION_SEQ</table>
+    </record>
+    <record>
+        <schema>batch</schema>
+        <table>BATCH_JOB_INSTANCE</table>
+    </record>
+    <record>
+        <schema>batch</schema>
+        <table>BATCH_JOB_SEQ</table>
+    </record>
+    <record>
+        <schema>batch</schema>
+        <table>BATCH_STEP_EXECUTION</table>
+    </record>
+    <record>
+        <schema>batch</schema>
+        <table>BATCH_STEP_EXECUTION_CONTEXT</table>
+    </record>
+    <record>
+        <schema>batch</schema>
+        <table>BATCH_STEP_EXECUTION_SEQ</table>
+    </record>
+    <record>
+        <schema>batch</schema>
+        <table>EXAM_RESULT</table>
+    </record>
+    <record>
+        <schema>test</schema>
+        <table>aaa</table>
+    </record>
+    <record>
+        <schema>test2</schema>
+        <table>bbb</table>
+    </record>
+
+</g-able>

@@ -1,0 +1,77 @@
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:batch="http://www.springframework.org/schema/batch"
+        xmlns:task="http://www.springframework.org/schema/task"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+        xsi:schemaLocation="http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		                http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-3.0.xsd
+		                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		                http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd http://www.springframework.org/schema/data/mongo https://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
+
+    <!-- 	import datasource file -->
+    <import resource="classpath:datasource/context-Microsoft-SQL-Server.xml"/>
+
+    <import resource="classpath:datasource/context-datasource.xml"/>
+
+    <import resource="classpath:datasource/context-mongoDB.xml"/>
+
+    <import resource="classpath:datasource/context-postgres.xml"/>
+
+    <import resource="classpath:spring-batch/JobLauncher.xml"/>
+
+    <import resource="classpath:jobs/steps/*.xml"/>
+
+
+    <import resource="classpath:jobs/batch-start-job.xml"/>
+    <import resource="classpath:jobs/batch-job-daily.xml"/>
+<!--    <import resource="classpath:jobs/batch-job-data-pump.xml"/>-->
+<!--    <import resource="classpath:jobs/batch-job-dimension.xml"/>-->
+<!--    <import resource="classpath:jobs/batch-job-data-preparation.xml"/>-->
+<!--    <import resource="classpath:jobs/file-csv-job.xml"/>-->
+    <import resource="classpath:jobs/batch-end-job.xml"/>
+    <!--    <import resource="classpath:jobs/batch-job-queryExcelTemplate.xml"/>-->
+
+    <!-- 	import file job.xml -->
+    <!--        <import resource="classpath:jobs/batch-job1.xml"/>-->
+    <!--    <import resource="classpath:jobs/batch-job2.xml"/>-->
+    <!--    <import resource="classpath:jobs/batch-job-user.xml"/>-->
+
+    <!--    <import resource="classpath:jobs/batch-init.xml"/>-->
+
+
+    <!--    <import resource="classpath:jobs/batch-job-checkLastDate.xml"/>-->
+
+
+    <!--        <import resource="classpath:jobs/batch-job-test-datasource.xml"/>-->
+    <!--    <import resource="classpath:jobs/batch-job-parallel.xml"/>-->
+
+    <!--    <import resource="classpath:jobs/batch-job-multi-Datasource.xml"/>-->
+    <!--    <import resource="classpath:jobs/batch-job-json.xml"/>-->
+    <!--    <import resource="classpath:jobs/batch-job-test_Library.xml"/>-->
+
+    <!--    <import resource="classpath:jobs/batch-job-accessFile.xml"/>-->
+    <!--    <import resource="classpath:jobs/batch-job-retry.xml"/>-->
+
+
+    <context:property-placeholder location="classpath:mongoconfig.properties"/>
+
+    <!-- JobRepository and JobLauncher are configuration/setup classes -->
+    <!-- 	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean" /> -->
+
+    <!-- Step will need a transaction manager -->
+
+
+    <!-- <task:scheduler id="myScheduler" pool-size="10"/> -->
+    <!-- <task:executor id="executorWithPoolSizeRange"
+                     pool-size="5-25"
+                     queue-capacity="100"/> -->
+
+    <!-- <task:scheduled-tasks> -->
+    <!-- 	  	<task:scheduled ref="demoServiceXmlConfig" method="demoServiceMethod" cron="#{applicationProps['cron.expression']}" /> -->
+    <!-- 	  	<task:scheduled ref="itemProcessor" method="demoSchduleMethod"  cron="*/5 * * * * ?" /> -->
+    <!-- <task:scheduled ref="itemProcessor" method="demoSchduleMethod" fixed-rate="5000"/>
+</task:scheduled-tasks> -->
+
+</beans>			

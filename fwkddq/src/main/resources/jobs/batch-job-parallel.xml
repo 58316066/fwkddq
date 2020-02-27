@@ -1,0 +1,39 @@
+<beans:beans xmlns="http://www.springframework.org/schema/batch"
+             xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/batch
+           http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
+
+    <job id="job">
+        <split id="split_1" task-executor="taskExecutor" next="step_24">
+            <flow>
+                <step id="step_21">
+                    <tasklet ref="taskletStep_1"/>
+                </step>
+            </flow>
+            <flow>
+                <step id="step_22">
+                    <tasklet ref="taskletStep_2"/>
+                </step>
+            </flow>
+            <flow>
+                <step id="step_23">
+                    <tasklet ref="taskletStep_3"/>
+                </step>
+            </flow>
+        </split>
+        <step id="step_24">
+            <tasklet ref="taskletStep_4"/>
+        </step>
+    </job>
+
+    <beans:bean id="taskletStep_1" class="com.gable.dos.ddq.controller.itemProcess.SimpleStep" />
+    <beans:bean id="taskletStep_2" class="com.gable.dos.ddq.controller.itemProcess.SimpleStep" />
+    <beans:bean id="taskletStep_3" class="com.gable.dos.ddq.controller.itemProcess.SimpleStep" />
+    <beans:bean id="taskletStep_4" class="com.gable.dos.ddq.controller.itemProcess.SimpleStep" />
+
+    <beans:bean id="taskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
+
+</beans:beans>

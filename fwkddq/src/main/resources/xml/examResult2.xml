@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UniversityExamResultList>
+    <ExamResult>
+        <dob>1999-03-04</dob>
+        <percentage>20.0</percentage>
+        <studentName>Mamu B</studentName>
+    </ExamResult>
+    <ExamResult>
+        <dob>1985-02-21</dob>
+        <percentage>63.0</percentage>
+        <studentName>Nani K</studentName>
+    </ExamResult>
+    <ExamResult>
+        <dob>1990-07-10</dob>
+        <percentage>97.0</percentage>
+        <studentName>Dit P</studentName>
+    </ExamResult>
+    <ExamResult>
+        <dob>1975-12-07</dob>
+        <percentage>82.0</percentage>
+        <studentName>H Yaa</studentName>
+    </ExamResult>
+    <ExamResult>
+        <dob>1980-10-07</dob>
+        <percentage>80.0</percentage>
+        <studentName>Haa Yaa</studentName>
+    </ExamResult>
+</UniversityExamResultList>

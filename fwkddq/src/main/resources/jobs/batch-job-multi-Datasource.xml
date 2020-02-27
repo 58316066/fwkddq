@@ -1,0 +1,35 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:batch="http://www.springframework.org/schema/batch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/batch
+		                http://www.springframework.org/schema/batch/spring-batch-3.0.xsd
+		                http://www.springframework.org/schema/beans
+		                http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+    <import resource="classpath:datasource/context-mongoDB.xml"/>
+    <import resource="classpath:datasource/context-datasource.xml"/>
+    <import resource="classpath:datasource/context-postgres.xml"/>
+    <import resource="classpath:spring-batch/JobLauncher.xml"/>
+    <import resource="classpath:jobs/steps/*.xml"/>
+
+    <!-- Batch Job MultiDataSource -->
+    <batch:job id="MultiDataSource1">
+        <batch:step id="MultiDataSource_1" next="MultiDataSource_2" allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="readerMariaDB" writer="WriterNull"
+                             processor="ItemProcess" commit-interval="50"/>
+            </batch:tasklet>
+        </batch:step>
+        <batch:step id="MultiDataSource_2"  allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="readerPostgresTables2" writer="WriterNull"
+                             processor="ItemProcess" commit-interval="50"/>
+            </batch:tasklet>
+        </batch:step>
+<!--        <batch:step id="CompareMultiDataSource" allow-start-if-complete="true">-->
+<!--            <batch:tasklet transaction-manager="transactionManager">-->
+<!--                <batch:chunk reader="readerCompare" writer="itemWriterMongoOutput"-->
+<!--                             processor="ProcessCompareMultiDataSource" commit-interval="50"/>-->
+<!--            </batch:tasklet>-->
+<!--        </batch:step>-->
+    </batch:job>
+</beans>

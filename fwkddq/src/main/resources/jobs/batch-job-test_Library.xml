@@ -1,0 +1,45 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:batch="http://www.springframework.org/schema/batch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/batch
+		                http://www.springframework.org/schema/batch/spring-batch-3.0.xsd
+		                http://www.springframework.org/schema/beans
+		                http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+    <import resource="classpath:datasource/context-mongoDB.xml"/>
+
+    <import resource="classpath:datasource/context-datasource.xml"/>
+
+    <import resource="classpath:datasource/context-postgres.xml"/>
+
+    <import resource="classpath:spring-batch/JobLauncher.xml"/>
+
+    <import resource="classpath:jobs/steps/*.xml"/>
+
+<!--        <batch:job id="test_Library30">-->
+<!--            <batch:step id="test_Library_1" allow-start-if-complete="true">-->
+<!--                <batch:tasklet transaction-manager="transactionManager">-->
+<!--                    <batch:chunk reader="readMongo" writer="itemWriterTestInterface"-->
+<!--                                 processor="itemLogsProcessorTestLib" commit-interval="100"/>-->
+<!--                </batch:tasklet>-->
+<!--            </batch:step>-->
+<!--            <batch:listeners>-->
+<!--                <batch:listener ref="jobListener"/>-->
+<!--            </batch:listeners>-->
+<!--        </batch:job>-->
+
+    <!-- Batch Job listAllTables -->
+    <batch:job id="test_Library30">
+        <batch:step id="test_Library_1" allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="readerPostgresTables" writer="itemWriterTestInterface"
+                             processor="itemLogsProcessorTestLib" commit-interval="100"/>
+            </batch:tasklet>
+        </batch:step>
+        <batch:listeners>
+            <batch:listener ref="jobListener"/>
+        </batch:listeners>
+    </batch:job>
+
+    <!--======================= JOB TEST DATASOURCE PROCESS FROM PostgresDB =======================-->
+
+</beans>

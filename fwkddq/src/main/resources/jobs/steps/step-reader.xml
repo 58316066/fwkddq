@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!--    <import resource="classpath:datasource/context-datasource.xml"/>-->
+
+
+    <!-- ItemReader which reads data from XML file -->
+    <bean id="xmlItemReader" class="org.springframework.batch.item.xml.StaxEventItemReader">
+        <property name="resource" value="classpath:xml/examResult.xml"/>
+        <property name="fragmentRootElementName" value="ExamResult"/>
+        <property name="unmarshaller">
+            <bean class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+                <property name="classesToBeBound">
+                    <list>
+                        <value>com.gable.dos.ddq.model.ExamResult</value>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- ItemReader which reads data-tables from datasource -->
+    <bean id="readerMariaDBTables" class="org.springframework.batch.item.database.JdbcCursorItemReader" scope="step">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="sql" value="select
+                                        a.TABLE_SCHEMA
+                                        ,a.TABLE_NAME
+                                        ,a.ROW_FORMAT
+                                        ,a.TABLE_ROWS
+                                        ,a.CREATE_TIME
+                                        ,a.UPDATE_TIME
+                                        ,a.CHECK_TIME
+                                    from
+                                        information_schema.tables a
+                                    where
+                                        a.TABLE_TYPE = 'BASE TABLE'
+                                    and (a.TABLE_SCHEMA &lt;&gt; 'mysql' and a.TABLE_SCHEMA &lt;&gt; 'performance_schema')
+                                    order by a.TABLE_SCHEMA, a.TABLE_NAME"/>
+        <property name="rowMapper">
+            <bean class="com.gable.dos.ddq.controller.itemReader.rowMapper.TableMapper"/>
+        </property>
+    </bean>
+
+
+    <!-- ItemReader which reads data-tables from datasource -->
+    <bean id="readerPostgresTables" class="org.springframework.batch.item.database.JdbcCursorItemReader" scope="step">
+        <property name="dataSource" ref="SqlServer"/>
+        <!--        <property name="dataSource" ref="myDataSource"/>-->
+        <property name="sql">
+            <value>
+                <![CDATA[
+                     select
+                         a.TABLE_SCHEMA
+                        ,a.TABLE_NAME
+                        ,a.table_type
+                        --,a.TABLE_ROWS
+                        --,a.CREATE_TIME
+                        --,a.UPDATE_TIME
+                        --,a.CHECK_TIME
+                    from
+                        information_schema.tables a
+                    where
+                         a.TABLE_TYPE = 'BASE TABLE'
+                    and (a.TABLE_SCHEMA <> 'information_schema' and a.TABLE_SCHEMA <> 'pg_catalog')
+                    order by a.TABLE_SCHEMA, a.TABLE_NAME
+
+                ]]>
+            </value>
+        </property>
+        <property name="rowMapper">
+            <bean class="com.gable.dos.ddq.controller.itemReader.rowMapper.PostgresTableMapper">
+                <property name="dataSource" value="SqlServer"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="itemReader-ReadAllTableDataSource" class="org.springframework.batch.item.database.JdbcCursorItemReader"
+          scope="step">
+        <property name="dataSource" ref="SqlServer"/>
+        <!--        <property name="dataSource" ref="myDataSource"/>-->
+        <property name="sql">
+            <value>
+                <![CDATA[
+                     select
+                         a.TABLE_SCHEMA
+                        ,a.TABLE_NAME
+                        ,a.table_type
+                        --,a.TABLE_ROWS
+                        --,a.CREATE_TIME
+                        --,a.UPDATE_TIME
+                        --,a.CHECK_TIME
+                    from
+                        information_schema.tables a
+                    where
+                         a.TABLE_TYPE = 'BASE TABLE'
+                    and (a.TABLE_SCHEMA <> 'information_schema' and a.TABLE_SCHEMA <> 'pg_catalog')
+                    order by a.TABLE_SCHEMA, a.TABLE_NAME
+
+                ]]>
+            </value>
+        </property>
+        <property name="rowMapper">
+            <bean class="com.gable.dos.ddq.controller.itemReader.rowMapper.RowMapperAllTableDataSource">
+                <property name="datasourceName" value="SqlServer"/>
+            </bean>
+        </property>
+
+    </bean>
+
+    <bean id="ReadDataSourceRelation"  class="com.gable.dos.ddq.controller.itemReader.readRelationConfig" scope="step"/>
+
+    <!-- ItemReader which reads data-tables from datasource -->
+    <bean id="readerPostgresColumns" class="org.springframework.batch.item.database.JdbcCursorItemReader" scope="step">
+        <property name="dataSource" ref="myDataSource"/>
+        <property name="sql">
+            <value>
+                <![CDATA[
+                        select
+                                  a.COLUMN_NAME
+                                 ,a.udt_name
+                                 ,a.IS_NULLABLE
+                                 ,a.COLUMN_DEFAULT
+                                 ,a.character_maximum_length
+                                 ,a.numeric_precision
+                                 ,a.numeric_precision_radix
+                                 ,a.numeric_scale
+                        from
+                            information_schema.COLUMNS a
+                        where
+                                a.TABLE_SCHEMA = 'public'
+                            and a.TABLE_NAME   = 'account'
+                        order by a.ORDINAL_POSITION;
+                ]]>
+            </value>
+        </property>
+        <property name="rowMapper">
+            <bean class="com.gable.dos.ddq.controller.itemReader.rowMapper.PostgresColumnMapper"/>
+        </property>
+    </bean>
+
+
+    <!-- ItemReader which reads data-columns from datasource -->
+    <bean id="readerMariaDBColumns" class="org.springframework.batch.item.database.JdbcCursorItemReader" scope="step">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="sql" value="select
+                                      a.`COLUMN_NAME`
+                                     ,a.`COLUMN_TYPE`
+                                     ,a.`IS_NULLABLE`
+                                     ,a.`COLUMN_KEY`
+                                     ,a.`COLUMN_DEFAULT`
+                                     ,a.`EXTRA`
+                                    from
+                                     information_schema.`COLUMNS` a
+                                    where
+                                         a.TABLE_SCHEMA = 'batch'
+                                        and a.TABLE_NAME = 'BATCH_JOB_EXECUTION'
+                                    order by a.ORDINAL_POSITION;"/>
+        <property name="rowMapper">
+            <bean class="com.gable.dos.ddq.controller.itemReader.rowMapper.ColumnMapper"/>
+        </property>
+    </bean>
+
+    <!-- READER MariaDB COLUMNS -->
+    <bean id="readerMariaDBColumns2" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="sql">
+            <value>
+                <![CDATA[
+                    select
+                         a.TABLE_SCHEMA
+                         ,a.TABLE_NAME
+                         ,a.`COLUMN_NAME`
+                         ,a.`COLUMN_TYPE`
+                         ,a.ORDINAL_POSITION
+                         ,a.`IS_NULLABLE`
+                         ,a.`COLUMN_KEY`
+                         ,a.`COLUMN_DEFAULT`
+                         ,a.`EXTRA`
+                        from
+                         information_schema.`COLUMNS` a
+                        where
+                         (a.TABLE_SCHEMA <> 'mysql' and a.TABLE_SCHEMA <> 'performance_schema' and a.TABLE_SCHEMA <> 'information_schema')
+                        order by a.TABLE_SCHEMA,a.TABLE_NAME,a.ORDINAL_POSITION;
+                ]]>
+            </value>
+        </property>
+        <property name="rowMapper">
+            <bean class="com.gable.dos.ddq.controller.itemReader.rowMapper.ColumnMapper"/>
+        </property>
+    </bean>
+
+    <!-- READER MariaDB TABLES -->
+    <bean id="readerMariaDBNew" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="sql">
+            <value>
+                <![CDATA[
+                   select
+                     a.TABLE_SCHEMA
+                    ,a.TABLE_NAME
+                    ,a.ROW_FORMAT
+                    ,a.TABLE_ROWS
+                    ,a.CREATE_TIME
+                    ,a.UPDATE_TIME
+                    ,a.CHECK_TIME
+                from
+                    information_schema.tables a
+                where
+                     a.TABLE_TYPE = 'BASE TABLE'
+                and (a.TABLE_SCHEMA <> 'mysql' and a.TABLE_SCHEMA <> 'performance_schema')
+                order by a.TABLE_SCHEMA, a.TABLE_NAME;
+                ]]>
+            </value>
+        </property>
+        <property name="rowMapper">
+            <!--            <bean class="ColumnMapper" />-->
+            <bean class="com.gable.dos.ddq.controller.itemReader.rowMapper.Map_TablesList"/>
+        </property>
+    </bean>
+
+    <!-- READER MariaDB TABLES -->
+    <bean id="readerMariaDBNewColumns" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="sql">
+            <value>
+                <![CDATA[
+                   select
+                     a.TABLE_SCHEMA
+                    ,a.TABLE_NAME
+                    ,a.ROW_FORMAT
+                    ,a.TABLE_ROWS
+                    ,a.CREATE_TIME
+                    ,a.UPDATE_TIME
+                    ,a.CHECK_TIME
+                from
+                    information_schema.tables a
+                where
+                     a.TABLE_TYPE = 'BASE TABLE'
+                and (a.TABLE_SCHEMA <> 'mysql' and a.TABLE_SCHEMA <> 'performance_schema')
+                order by a.TABLE_SCHEMA, a.TABLE_NAME;
+                ]]>
+            </value>
+        </property>
+        <property name="rowMapper">
+            <!--            <bean class="ColumnMapper" />-->
+            <bean class="com.gable.dos.ddq.controller.itemReader.rowMapper.Map_FieldList"/>
+        </property>
+    </bean>
+
+
+    <!-- READER_Drop MONGODB -->
+    <bean id="initialInputReader" class="com.gable.dos.ddq.controller.itemReader.MongoDropItemReader" scope="step">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection_name" value="FWKDDQ_Config"/>
+    </bean>
+
+    <!-- READER_Drop MONGODB 2 -->
+    <bean id="initialOutputReader" class="com.gable.dos.ddq.controller.itemReader.MongoDropItemReader" scope="step">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection_name" value="FWKDDQ_Output"/>
+    </bean>
+
+    <!-- READER_Drop MONGODB 3 -->
+    <bean id="initialReconcileReader" class="com.gable.dos.ddq.controller.itemReader.MongoDropItemReader" scope="step">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection_name" value="FWKDDQ_ReconCile"/>
+    </bean>
+
+    <!-- READER_Drop MONGODB 4 -->
+    <bean id="initialBaselineReader" class="com.gable.dos.ddq.controller.itemReader.MongoDropItemReader" scope="step">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection_name" value="FWKDDQ_BaseLine"/>
+    </bean>
+
+    <!-- READER_Drop MONGODB 5 -->
+    <bean id="initialConfigRelation" class="com.gable.dos.ddq.controller.itemReader.MongoDropItemReader" scope="step">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection_name" value="FWKDDQ_RelationConfig"/>
+    </bean>
+
+    <!--========= STEP READER FOR DATASOURCE examlResultAudit.xml =========-->
+    <bean id="xmlItemReaderAudit" class="org.springframework.batch.item.xml.StaxEventItemReader">
+        <property name="resource" value="classpath:xml/examlResultAudit.xml"/>
+        <property name="fragmentRootElementName" value="record"/>
+        <property name="unmarshaller">
+            <bean class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+                <property name="classesToBeBound">
+                    <list>
+                        <value>com.gable.dos.ddq.model.ExamResultAudit</value>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <!--========= STEP READER FOR DATASOURCE  =========-->
+    <bean id="readerMariaDB" class="org.springframework.batch.item.database.JdbcCursorItemReader" scope="step">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="sql" value="select count(*) as resultCount from batch.data_demo;"/>
+        <property name="rowMapper">
+            <bean class="com.gable.dos.ddq.controller.multiDatasource.Mapper"/>
+        </property>
+    </bean>
+
+    <!-- ItemReader which reads data-tables from datasource -->
+    <bean id="readerPostgresTables2" class="org.springframework.batch.item.database.JdbcCursorItemReader" scope="step">
+        <property name="dataSource" ref="myDataSource"/>
+        <property name="sql">
+            <value>
+                <![CDATA[
+                      select count(*) as resultCount from public.data_demo;
+
+                ]]>
+            </value>
+        </property>
+        <property name="rowMapper">
+            <bean class="com.gable.dos.ddq.controller.multiDatasource.Mapper"/>
+        </property>
+    </bean>
+
+    <!--========= STEP READER FOR DATASOURCE  =========-->
+    <bean id="readerCompare" class="com.gable.dos.ddq.controller.itemReader.ItemReaderMultiDataSource"/>
+
+    <bean id="readerJson" class="com.gable.dos.ddq.controller.itemReader.ReadJSON"/>
+
+    <bean id="itemLogsProcessorTestLib" class="com.gable.dos.ddq.controller.itemProcess.itemLogsProcessorTestLib"/>
+
+    <bean id="ReaderFile" class="com.gable.dos.ddq.controller.accessLocal.ReaderFile"/>
+
+    <bean id="readerGetLastDateMongo" class="com.gable.dos.ddq.library.GetLastDate" scope="step">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection_name" value="FWKDDQ_Output"/>
+    </bean>
+
+    <bean id="step_Delete_list_0" class="com.gable.dos.ddq.controller.Delete_list"/>
+
+    <bean id="readerTestDataSource" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+        <property name="dataSource" ref="SqlServer"/>
+        <property name="sql">
+            <value>
+                <![CDATA[
+                         select
+                            a.TABLE_SCHEMA
+                            ,a.TABLE_NAME
+                         from
+                            information_schema.tables a
+                         where
+                            a.TABLE_TYPE = 'BASE TABLE'
+                         order by a.TABLE_SCHEMA, a.TABLE_NAME
+                ]]>
+            </value>
+        </property>
+        <property name="rowMapper">
+            <bean class="com.gable.dos.ddq.controller.itemReader.rowMapper.RowMapTestDataSource"/>
+        </property>
+    </bean>
+
+
+    <bean id="readerStarted" class="com.gable.dos.ddq.controller.itemReader.readerStarted"/>
+
+    <bean id="readerEnd" class="com.gable.dos.ddq.controller.itemReader.readerEnd"/>
+
+    <bean id="readerTimeStamp" class="com.gable.dos.ddq.controller.itemReader.readerTimeStamp" scope="step">
+        <property name="mongoOperations" ref="mongoTemplate"/>
+        <property name="collection_name" value="TimeStamp"/>
+    </bean>
+    <bean id="readerHistory_Repo" class="com.gable.dos.ddq.controller.itemReader.readerHistory_Repo" scope="step">
+        <!--        <property name="mongoOperations" ref="mongoTemplate"/>-->
+        <!--        <property name="collection_name" value="TimeStamp"/>-->
+    </bean>
+
+    <!--    <bean id="readerHistory_Repo" class="org.springframework.batch.item.database.JdbcCursorItemReader">-->
+    <!--        <property name="dataSource" ref="dataSource"/>-->
+    <!--        <property name="sql">-->
+    <!--            <bean class="com.gable.dos.ddq.springbatch.SetSQLHistory_Repo"/>-->
+    <!--        </property>-->
+    <!--        <property name="rowMapper">-->
+    <!--            <bean class="com.gable.dos.ddq.springbatch.itemReader.rowMapper.readerHistory_Repo"/>-->
+    <!--        </property>-->
+    <!--    </bean>-->
+
+
+    <!--    <bean id="readerGetTableConfig" class="org.springframework.batch.item.data.MongoItemReader" scope="step">-->
+    <!--        <property name="template" ref="mongoTemplate"/>-->
+    <!--        <property name="query">-->
+    <!--            <bean class="com.gable.dos.ddq.controller.SetQueryGetTableConfig"/>-->
+    <!--        </property>-->
+
+    <!--        &lt;!&ndash;        <property name="query" value="{ }"/>&ndash;&gt;-->
+    <!--        <property name="sort">-->
+    <!--            <map>-->
+    <!--                <entry key="table_name"-->
+    <!--                       value="#{T(org.springframework.data.domain.Sort.Direction).ASC}"/>-->
+    <!--            </map>-->
+    <!--        </property>-->
+    <!--        <property name="collection" value="FWKDDQ_Config"/>-->
+    <!--        <property name="targetType" value="com.gable.dos.ddq.model.TableAudit"/>-->
+
+    <!--    </bean>-->
+
+    <bean id="readerGetTableConfig" class="com.gable.dos.ddq.controller.SetQueryGetTableConfig" scope="step">
+        <property name="mongoOperations" ref="mongoTemplate"/>
+        <property name="collection_name" value="FWKDDQ_Config"/>
+    </bean>
+
+    <bean id="readerTableType-Dimension" class="com.gable.dos.ddq.controller.itemReader.ReadTableDimension"
+          scope="step">
+        <property name="mongoOperations" ref="mongoTemplate"/>
+        <property name="collection_name" value="FWKDDQ_Config"/>
+    </bean>
+
+    <bean id="readerDimension_rule1" class="com.gable.dos.ddq.controller.itemReader.readerDimension_rule1"
+          scope="step"/>
+
+    <bean id="readerDimension_rule2" class="com.gable.dos.ddq.controller.itemReader.readerDimension_rule2"
+          scope="step"/>
+
+    <bean id="readerDimension_rule3" class="com.gable.dos.ddq.controller.itemReader.readerDimension_rule3"
+          scope="step"/>
+
+    <bean id="readerCloneTemplate" class="com.gable.dos.ddq.controller.itemReader.readerCloneTemplate"/>
+
+    <bean id="readArguments" class="com.gable.dos.ddq.controller.itemReader.readDataPumpArguments"/>
+
+    <bean id="reader-file" class="com.gable.dos.ddq.controller.itemReader.reader_csv_file"/>
+
+    <bean id="read-header-from-excel" class="com.gable.dos.ddq.controller.itemReader.readerGetSourceFile"/>
+
+    <bean id="read-header-from-csv" class="com.gable.dos.ddq.controller.itemReader.readerGetSourceFile_csv"/>
+
+    <bean id="readerDDLScript" class="com.gable.dos.ddq.controller.itemReader.readerDDLScript"/>
+
+    <bean id="readCheckFileName" class="com.gable.dos.ddq.controller.itemReader.readCheckFileName"/>
+
+    <bean id="read-actual-length" class="com.gable.dos.ddq.controller.itemReader.read_actual_length"/>
+
+    <bean id="export_actual_table_0" class="com.gable.dos.ddq.controller.itemReader.export_actual_table"/>
+
+    <bean id="readParallelStep1" class="com.gable.dos.ddq.controller.itemReader.readParallelStep1"/>
+    <bean id="readParallelStep2" class="com.gable.dos.ddq.controller.itemReader.readParallelStep2"/>
+    <bean id="readParallelStep3" class="com.gable.dos.ddq.controller.itemReader.readParallelStep3"/>
+    <bean id="readParallelStep4" class="com.gable.dos.ddq.controller.itemReader.readParallelStep4"/>
+
+</beans>

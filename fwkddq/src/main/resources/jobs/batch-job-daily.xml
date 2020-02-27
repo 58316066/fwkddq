@@ -1,0 +1,127 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:batch="http://www.springframework.org/schema/batch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/batch
+		                http://www.springframework.org/schema/batch/spring-batch-3.0.xsd
+		                http://www.springframework.org/schema/beans
+		                http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+    <import resource="classpath:datasource/*.xml"/>
+    <import resource="classpath:spring-batch/JobLauncher.xml"/>
+    <import resource="classpath:jobs/steps/*.xml"/>
+
+
+    <!--======================= Batch Job listAllTables =======================-->
+    <batch:job id="listAllTables22">
+        <!--        <batch:step id="listAllTables_0" next="listAllTables_1" allow-start-if-complete="true">-->
+        <!--            <batch:tasklet transaction-manager="transactionManager">-->
+        <!--                <batch:chunk reader="readerPostgresTableForMakeList" writer="WriterNull"-->
+        <!--                             processor="ItemSaveTableLists" commit-interval="100"/>-->
+        <!--            </batch:tasklet>-->
+        <!--        </batch:step>-->
+        <batch:step id="listAllTables_1" allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="itemReader-ReadAllTableDataSource" writer="itemWriterMongoOutput"
+                             processor="itemLogsProcessor" commit-interval="100"/>
+            </batch:tasklet>
+        </batch:step>
+        <batch:listeners>
+            <batch:listener ref="jobListenerItemLogsProgress"/>
+        </batch:listeners>
+    </batch:job>
+
+    <!--======================= JOB TEST DATASOURCE PROCESS FROM PostgresDB =======================-->
+
+    <batch:job id="AuditCountRecord131">
+        <batch:step id="AuditCountRec_1" allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="readerGetTableConfig" writer="itemWriterMongoOutput"
+                             processor="ProcessAuditCountRecord" commit-interval="1"/>
+            </batch:tasklet>
+        </batch:step>
+        <batch:listeners>
+            <batch:listener ref="ProcessFilterAuditCountRecord"/>
+        </batch:listeners>
+    </batch:job>
+
+    <batch:job id="AuditStructure8">
+        <batch:step id="AuditStructure_1" allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="readerGetTableConfig" writer="itemWriterMongoOutput"
+                             processor="ProcessAuditStructure" commit-interval="1"/>
+            </batch:tasklet>
+        </batch:step>
+        <batch:listeners>
+            <batch:listener ref="ProcessFilterAuditStructure"/>
+        </batch:listeners>
+    </batch:job>
+
+    <batch:job id="AuditSizeofTables1">
+        <batch:step id="AuditSizeofTables_1" allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="readerGetTableConfig" writer="itemWriterMongoOutput"
+                             processor="ProcessSizeofTables" commit-interval="1"/>
+            </batch:tasklet>
+        </batch:step>
+        <batch:listeners>
+            <batch:listener ref="ProcessSizeofTables"/>
+        </batch:listeners>
+    </batch:job>
+
+</beans>
+
+
+        <!--    For Postgres DB-->
+        <!--    <batch:job id="listAllTables">-->
+        <!--        <batch:step id="listAllTables_0" next="listAllTables_1" allow-start-if-complete="true">-->
+        <!--            <batch:tasklet transaction-manager="transactionManager">-->
+        <!--                <batch:chunk reader="readerPostgresTableForMakeList" writer="WriterNull"-->
+        <!--                             processor="ItemSaveTableLists" commit-interval="100"/>-->
+        <!--            </batch:tasklet>-->
+        <!--        </batch:step>-->
+        <!--        <batch:step id="listAllTables_1" allow-start-if-complete="true">-->
+        <!--            <batch:tasklet transaction-manager="transactionManager">-->
+        <!--                <batch:chunk reader="readerPostgresTableForMakeList" writer="itemWriterMongoOutput"-->
+        <!--                             processor="itemLogsProcessor" commit-interval="100"/>-->
+        <!--            </batch:tasklet>-->
+        <!--        </batch:step>-->
+        <!--    </batch:job>-->
+
+        <!--    For Maria DB-->
+        <!--    <batch:job id="listAllTables">-->
+        <!--        <batch:step id="listAllTables_0" next="listAllTables_1" allow-start-if-complete="true">-->
+        <!--            <batch:tasklet transaction-manager="transactionManager">-->
+        <!--                <batch:chunk reader="readerMariaDBTables" writer="WriterNull"-->
+        <!--                             processor="ItemSaveTableLists" commit-interval="100"/>-->
+        <!--            </batch:tasklet>-->
+        <!--        </batch:step>-->
+        <!--        <batch:step id="listAllTables_1" allow-start-if-complete="true">-->
+        <!--            <batch:tasklet transaction-manager="transactionManager">-->
+        <!--                <batch:chunk reader="readerMariaDBNew" writer="itemWriterMongoOutput"-->
+        <!--                             processor="itemLogsProcessor" commit-interval="100"/>-->
+        <!--            </batch:tasklet>-->
+        <!--        </batch:step>-->
+        <!--    </batch:job>-->
+        <!--======================= Batch Job listAllTables =======================-->
+
+
+        <!--======================= JOB TEST DATASOURCE PROCESS FROM PostgresDB =======================-->
+
+        <!--======================= JOB TEST DATASOURCE PROCESS FROM XML =======================-->
+        <!--    <batch:job id="TableAudit_Test" restartable="true">-->
+        <!--        <batch:step id="countAllTables_1" next="getStructureAllTables_2" allow-start-if-complete="true">-->
+        <!--            <batch:tasklet transaction-manager="transactionManager">-->
+        <!--                <batch:chunk reader="xmlItemReaderAudit" writer="ItemWriterAudit"-->
+        <!--                             processor="ProcessAudit" commit-interval="20"/>-->
+        <!--            </batch:tasklet>-->
+        <!--        </batch:step>-->
+        <!--        <batch:step id="getStructureAllTables_2" allow-start-if-complete="true">-->
+        <!--            <batch:tasklet transaction-manager="transactionManager">-->
+        <!--                <batch:chunk reader="xmlItemReaderAudit" writer="ItemWriterAudit"-->
+        <!--                             processor="ProcessAuditStructure" commit-interval="20"/>-->
+        <!--            </batch:tasklet>-->
+        <!--        </batch:step>-->
+        <!--        <batch:listeners>-->
+        <!--            <batch:listener ref="jobListener"/>-->
+        <!--        </batch:listeners>-->
+        <!--    </batch:job>-->
+        <!--======================= JOB TEST DATASOURCE PROCESS FROM XML =======================-->

@@ -1,0 +1,43 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:batch="http://www.springframework.org/schema/batch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/batch
+		                http://www.springframework.org/schema/batch/spring-batch-3.0.xsd
+		                http://www.springframework.org/schema/beans
+		                http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+    <import resource="classpath:datasource/context-mongoDB.xml"/>
+    <import resource="classpath:datasource/context-datasource.xml"/>
+    <import resource="classpath:datasource/context-postgres.xml"/>
+    <import resource="classpath:spring-batch/JobLauncher.xml"/>
+    <import resource="classpath:jobs/steps/*.xml"/>
+
+
+    <batch:job id="checkLastDate49">
+        <batch:step id="checkLastDate_0" allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="readerGetLastDateMongo" writer="WriterNull"
+                             processor="ItemSaveTableLists" commit-interval="100"/>
+            </batch:tasklet>
+            <batch:next on="COMPLETED" to="checkLastDate_1"/>
+            <batch:end on="FAILED"/>
+        </batch:step>
+
+
+        <batch:step id="checkLastDate_1" allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="readerPostgresTables" writer="itemWriterMongoOutput"
+                             processor="ProcessAssignmentData" commit-interval="100"/>
+            </batch:tasklet>
+            <batch:next on="COMPLETED" to="step_Delete_list"/>
+            <batch:end on="FAILED"/>
+        </batch:step>
+        <batch:step id="step_Delete_list"  allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="step_Delete_list_0" writer="WriterNull"
+                             processor="ItemSaveTableLists" commit-interval="100"/>
+            </batch:tasklet>
+            <batch:next on="COMPLETED" to="checkLastDate_1"/>
+            <batch:end on="FAILED"/>
+        </batch:step>
+    </batch:job>
+</beans>

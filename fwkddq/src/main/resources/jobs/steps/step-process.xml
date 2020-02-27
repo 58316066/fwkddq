@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <!-- Optional ItemProcessor to perform business logic/filtering on the input records -->
+    <bean id="itemProcessor" class="com.gable.dos.ddq.controller.itemProcess.ExamResultItemProcessor"/>
+
+    <bean id="itemLogsProcessor" class="com.gable.dos.ddq.controller.itemProcess.ItemLogsProgress">
+        <property name="mongoOperations" ref="mongoTemplate"/>
+        <property name="collection_name" value="FWKDDQ_Output"/>
+    </bean>
+
+    <bean id="ProcessRelation" class="com.gable.dos.ddq.controller.itemProcess.ProcessRelationConfig"/>
+
+
+    <bean id="itemLogsProcessorDaily" class="com.gable.dos.ddq.controller.itemProcess.itemLogsProcessorDaily"/>
+
+    <bean id="ItemSaveTableLists" class="com.gable.dos.ddq.controller.itemProcess.ItemSaveTableLists"/>
+
+    <bean id="ProcessAudit" class="com.gable.dos.ddq.controller.itemProcess.ProcessFilterAudit"/>
+
+    <bean id="ProcessAuditStructure" class="com.gable.dos.ddq.controller.itemProcess.ProcessFilterAuditStructure">
+        <property name="mongoOperations" ref="mongoTemplate"/>
+        <property name="collection_name" value="FWKDDQ_Output"/>
+    </bean>
+
+    <bean id="ProcessAuditCountRecord" class="com.gable.dos.ddq.controller.itemProcess.ProcessAuditCountRecord">
+        <property name="mongoOperations" ref="mongoTemplate"/>
+        <property name="collection_name" value="FWKDDQ_Output"/>
+    </bean>
+
+    <bean id="ItemProcess" class="com.gable.dos.ddq.controller.multiDatasource.ItemProcess"/>
+
+    <bean id="ProcessTestInterface" class="com.gable.dos.ddq.library.Connection_executes_result_set"/>
+
+    <!--    <bean id="ProcessCompareMultiDataSource"-->
+    <!--          class="com.gable.dos.ddq.springbatch.itemProcess.ProcessCompareMultiDataSource"/>-->
+
+    <bean id="ProcessFile" class="com.gable.dos.ddq.controller.accessLocal.ProcessFile"/>
+
+    <bean id="ProcessAssignmentData" class="com.gable.dos.ddq.controller.itemProcess.ProcessAssignmentData"/>
+
+    <bean id="ProcessTestDataSource" class="com.gable.dos.ddq.controller.itemProcess.ItemProcessTestDataSource"/>
+
+    <bean id="ProcessSizeofTables" class="com.gable.dos.ddq.controller.itemProcess.ItemProcessSizeofTables">
+        <property name="mongoOperations" ref="mongoTemplate"/>
+        <property name="collection_name" value="FWKDDQ_Output"/>
+    </bean>
+
+    <bean id="ProcessTableType-Dimension" class="com.gable.dos.ddq.controller.itemProcess.ProcessTableType_Dimension"/>
+
+    <bean id="processDataPump" class="com.gable.dos.ddq.controller.itemProcess.processDataPump"/>
+
+    <bean id="processDimension_rule1" class="com.gable.dos.ddq.controller.itemProcess.processDimension_rule1">
+        <property name="mongoOperations" ref="mongoTemplate"/>
+        <property name="collection_name" value="FWKDDQ_Output"/>
+    </bean>
+
+    <bean id="processDimension_rule2" class="com.gable.dos.ddq.controller.itemProcess.processDimension_rule2">
+        <property name="mongoOperations" ref="mongoTemplate"/>
+        <property name="collection_name" value="FWKDDQ_RelationConfig"/>
+        <property name="collection_output" value="FWKDDQ_Output"/>
+    </bean>
+
+
+    <bean id="processDimension_rule3" class="com.gable.dos.ddq.controller.itemProcess.processDimension_rule3">
+        <property name="mongoOperations" ref="mongoTemplate"/>
+        <property name="collection_name" value="FWKDDQ_RelationConfig"/>
+        <property name="collection_output" value="FWKDDQ_Output"/>
+    </bean>
+
+
+    <!--    <bean id="ProcessJsonCompare" class="com.gable.dos.ddq.springbatch.ProcessJsonCompare"/>-->
+
+    <bean id="processStarted" class="com.gable.dos.ddq.controller.itemProcess.processStarted">
+        <property name="mongoOperations" ref="mongoTemplate"/>
+        <property name="collection_name" value="TimeStamp"/>
+    </bean>
+
+    <bean id="processEnd" class="com.gable.dos.ddq.controller.itemProcess.processEnd">
+        <property name="mongoOperations" ref="mongoTemplate"/>
+        <property name="collection_name" value="TimeStamp"/>
+    </bean>
+
+    <bean id="ProcessTimeStamp" class="com.gable.dos.ddq.controller.itemProcess.ProcessTimeStamp"/>
+
+    <bean id="processHistory_Repo" class="com.gable.dos.ddq.controller.itemProcess.processHistory_Repo"/>
+
+
+    <bean id="Itemgetmongo" class="com.gable.dos.ddq.controller.itemProcess.Itemgetmongo"/>
+
+    <bean id="process-clone-file" class="com.gable.dos.ddq.controller.itemProcess.process_clone_file_csv"/>
+
+    <bean id="replace-duplicate-column-name" class="com.gable.dos.ddq.controller.itemProcess.ProcessPreparation"/>
+
+    <bean id="change-DDL-length" class="com.gable.dos.ddq.controller.itemProcess.ProcessPreparation_2"/>
+
+    <bean id="createSQL-browse-files" class="com.gable.dos.ddq.controller.itemProcess.createSQL_browse_files"/>
+
+    <bean id="createSQL-actual-length" class="com.gable.dos.ddq.controller.itemProcess.createSQL_actual_length"/>
+
+    <bean id="run_command_diff_file" class="com.gable.dos.ddq.controller.itemProcess.run_command_diff_file"/>
+
+
+    <bean id="queryExcelTemplate_process" class="com.gable.dos.ddq.controller.itemProcess.queryExcelTemplate_process">
+        <!--        <property name="mongoOperations" ref="mongoTemplate"/>-->
+        <!--        <property name="collection_name" value="TimeStamp"/>-->
+    </bean>
+
+    <bean id="processParallelStep1" class="com.gable.dos.ddq.controller.itemProcess.processParallelStep1"/>
+    <bean id="processParallelStep2" class="com.gable.dos.ddq.controller.itemProcess.processParallelStep2"/>
+    <bean id="processParallelStep3" class="com.gable.dos.ddq.controller.itemProcess.processParallelStep3"/>
+    <bean id="processParallelStep4" class="com.gable.dos.ddq.controller.itemProcess.processParallelStep4"/>
+
+</beans>

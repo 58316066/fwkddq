@@ -1,0 +1,38 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:batch="http://www.springframework.org/schema/batch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/batch
+		                http://www.springframework.org/schema/batch/spring-batch-3.0.xsd
+		                http://www.springframework.org/schema/beans
+		                http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+    <import resource="classpath:datasource/*.xml"/>
+    <import resource="classpath:spring-batch/JobLauncher.xml"/>
+    <import resource="classpath:jobs/steps/*.xml"/>
+
+
+    <!--======================= Batch Job EndJob =======================-->
+
+    <batch:job id="EndJob_Times45">
+        <batch:step id="EndJob_1" next="EndJob_Process" allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="readerEnd" writer="writeTimeStamp"
+                             processor="processEnd" commit-interval="50"/>
+            </batch:tasklet>
+        </batch:step>
+        <batch:step id="EndJob_Process" allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="readerTimeStamp" writer="WriterNull"
+                             processor="ProcessTimeStamp" commit-interval="50"/>
+            </batch:tasklet>
+        </batch:step>
+    </batch:job>
+
+<!--    <batch:job id="Get_History_Repo2">-->
+<!--        <batch:step id="History_Repo_1" allow-start-if-complete="true">-->
+<!--            <batch:tasklet transaction-manager="transactionManager">-->
+<!--                <batch:chunk reader="readerHistory_Repo" writer="writeTimeStamp"-->
+<!--                             processor="processHistory_Repo" commit-interval="50"/>-->
+<!--            </batch:tasklet>-->
+<!--        </batch:step>-->
+<!--    </batch:job>-->
+</beans>

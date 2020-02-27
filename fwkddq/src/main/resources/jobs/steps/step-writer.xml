@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <!-- ItemWriter which writes data to database -->
+    <bean id="databaseItemWriter" class="org.springframework.batch.item.database.JdbcBatchItemWriter">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="sql">
+            <value>
+                <![CDATA[
+                    insert into EXAM_RESULT(STUDENT_NAME, DOB, PERCENTAGE)
+                    values (?, ?, ?)
+                ]]>
+            </value>
+        </property>
+
+        <!-- We need a custom setter to handle the conversion between Jodatime LocalDate and MySQL DATE -->
+        <property name="ItemPreparedStatementSetter">
+            <bean class="com.gable.dos.ddq.controller.itemWriter.ExamResultItemPreparedStatementSetter"/>
+        </property>
+    </bean>
+
+    <!-- ItemWriter which writes data-tables to database { Collection ==> table }  ${record.name}-->
+    <bean id="itemWriterAllTables" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="Tables"/>
+    </bean>
+
+    <!-- ItemWriter which writes data-columns to database -->
+    <bean id="itemWriterAllColumn" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="Column"/>
+    </bean>
+
+    <bean id="itemWriterMongo3" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="FWKDDQ_Config"/>
+    </bean>
+
+
+
+
+    <bean id="itemWriterRelationConfig" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="FWKDDQ_RelationConfig"/>
+    </bean>
+
+    <bean id="itemWriterMongoOutput" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="FWKDDQ_Output"/>
+    </bean>
+
+    <bean id="itemWriterColumnStructure" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="ColumnStructure"/>
+    </bean>
+
+    <bean id="itemWriterAllRecord" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="PostgresTables_AllRecord"/>
+    </bean>
+
+    <bean id="itemWriterTestInterface" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="PostgresTables_AllRecord_TestInterface"/>
+    </bean>
+
+    <bean id="itemWriterMongoPostgresColumns" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="PostgresColumns"/>
+    </bean>
+
+    <!-- ItemWriter which writes data-tables to database BatchJob_3 -->
+    <bean id="itemWriterMongotest" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="testJob_4"/>
+    </bean>
+
+    <!-- itemWriterDaily Writer to MongoDB -->
+    <bean id="itemWriterDaily" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="testJob_66"/>
+    </bean>
+
+    <bean id="RecodeWriterDaily" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="RecodeWriterDaily"/>
+    </bean>
+
+    <bean id="WriterNull" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="WriterNull"/>
+    </bean>
+
+
+    <bean id="ItemWriterStructure" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="PostgresTables_Structure"/>
+    </bean>
+
+    <bean id="InterfaceTable" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="InterfaceTable"/>
+    </bean>
+
+    <bean id="cvsFileItemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+        <!-- write to this csv file -->
+        <property name="resource" value="file:cvs/report.csv"/>
+        <property name="shouldDeleteIfExists" value="true"/>
+        <property name="lineAggregator">
+            <bean
+                    class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+                <property name="delimiter" value=","/>
+                <property name="fieldExtractor">
+                    <bean
+                            class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+                        <property name="names" value="schema , table"/>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="itemWriterMongoJSON" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="JSON"/>
+    </bean>
+
+    <bean id="itemWriterMongoJson" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="JsonHtml"/>
+    </bean>
+
+    <bean id="WriterCompareMultiDataSource" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="ResultCompare"/>
+    </bean>
+
+    <bean id="WriterTestDataSource" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="ResultTestDataSource"/>
+    </bean>
+
+
+    <bean id="writeParallelStep1" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="writeParallelStep"/>
+    </bean>
+
+    <bean id="writeTimeStamp" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="TimeStamp"/>
+    </bean>
+    <!--        <bean id="WriterNulsssl" class="com.gable.dos.ddq.springbatch.writetoMongo">-->
+    <bean id="WriterNulsssl" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="TesttttttttttttMongoNEW"/>
+    </bean>
+
+
+    <bean id="HistoryRepo" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="HistoryRepo"/>
+    </bean>
+
+    <bean id="create-DDL-script" class="com.gable.dos.ddq.controller.itemWriter.WriterPreparation"/>
+
+    <bean id="write-clone-file" class="com.gable.dos.ddq.controller.itemWriter.writer_clone_file_csv"/>
+
+    <bean id="WriterDDL_Create_Tables" class="com.gable.dos.ddq.controller.itemWriter.WriterDDL_Create_Tables"/>
+
+    <bean id="write-File-to-table" class="com.gable.dos.ddq.controller.itemWriter.write_File_to_table"/>
+
+    <bean id="write-templatetable-to-newtable" class="com.gable.dos.ddq.controller.write_templatetable_to_newtable"/>
+
+    <bean id="write-export-actual-table" class="com.gable.dos.ddq.controller.write_export_actual_table"/>
+
+    <bean id="writerDimension_rule1" class="org.springframework.batch.item.data.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="FWKDDQ_Output"/>
+    </bean>
+
+<!--    <bean id="writerDimension_rule2" class="org.springframework.batch.item.data.MongoItemWriter">-->
+<!--        <property name="template" ref="mongoTemplate"/>-->
+<!--        <property name="collection" value="FWKDDQ_Output"/>-->
+<!--    </bean>-->
+<!--    -->
+    <bean id="writerDimension_rule2" class="com.gable.dos.ddq.controller.itemWriter.MongoItemWriter">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="FWKDDQ_Output"/>
+    </bean>
+
+
+    <bean id="writerDimension_rule3" class="com.gable.dos.ddq.controller.itemWriter.writerDimension_rule3">
+        <property name="template" ref="mongoTemplate"/>
+        <property name="collection" value="FWKDDQ_Output"/>
+    </bean>
+
+    <bean id="writerDataPump" class="com.gable.dos.ddq.controller.itemWriter.writerDataPump"/>
+
+
+    <bean id="databaseItemWriterssss" class="org.springframework.batch.item.database.JdbcBatchItemWriter">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="sql">
+            <value>
+                <![CDATA[
+                        insert into EXAM_RESULT(STUDENT_NAME, DOB, PERCENTAGE)
+                    values (?, ?, ?)
+                ]]>
+            </value>
+        </property>
+
+        <!-- We need a custom setter to handle the conversion between Jodatime LocalDate and MySQL DATE -->
+        <property name="ItemPreparedStatementSetter">
+            <bean class="com.gable.dos.ddq.controller.itemWriter.ExamResultItemPreparedStatementSetter"/>
+        </property>
+    </bean>
+</beans>

@@ -1,0 +1,54 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:batch="http://www.springframework.org/schema/batch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/batch
+		                http://www.springframework.org/schema/batch/spring-batch-3.0.xsd
+		                http://www.springframework.org/schema/beans 
+		                http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+    <batch:job id="job_mariaDB">
+        <batch:step id="step_readAllTable" next="step_readAllColumn" allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="readerMariaDBTables" writer="itemWriterAllTables"
+                             processor="itemLogsProcessor" commit-interval="50"/>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="step_readAllColumn" allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="readerMariaDBColumns2" writer="itemWriterAllColumn"
+                             processor="itemLogsProcessor" commit-interval="50"/>
+            </batch:tasklet>
+        </batch:step>
+    </batch:job>
+
+
+
+
+    <batch:job id="initialAllColumn">
+        <batch:step id="initialAllColumn_1" allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="readerMariaDBNewColumns" writer="itemWriterColumnStructure"
+                             processor="itemLogsProcessor" commit-interval="5"/>
+            </batch:tasklet>
+        </batch:step>
+    </batch:job>
+
+
+<!--    <batch:job id="job_postgres">-->
+<!--        <batch:step id="step_postgres_Tables" next="step_postgres_Columns" allow-start-if-complete="true">-->
+<!--            <batch:tasklet transaction-manager="transactionManager">-->
+<!--                <batch:chunk reader="readerPostgresTables" writer="itemWriterMongoPostgresTables"-->
+<!--                             processor="itemLogsProcessor" commit-interval="100"/>-->
+<!--            </batch:tasklet>-->
+<!--        </batch:step>-->
+
+<!--        <batch:step id="step_postgres_Columns" allow-start-if-complete="true">-->
+<!--            <batch:tasklet transaction-manager="transactionManager">-->
+<!--                <batch:chunk reader="readerPostgresColumns" writer="itemWriterMongoPostgresColumns"-->
+<!--                             processor="itemLogsProcessor" commit-interval="5"/>-->
+<!--            </batch:tasklet>-->
+<!--        </batch:step>-->
+
+<!--    </batch:job>-->
+
+</beans>

@@ -1,0 +1,32 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:batch="http://www.springframework.org/schema/batch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/batch
+		                http://www.springframework.org/schema/batch/spring-batch-3.0.xsd
+		                http://www.springframework.org/schema/beans
+		                http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+    <import resource="classpath:datasource/*.xml"/>
+    <import resource="classpath:spring-batch/JobLauncher.xml"/>
+    <import resource="classpath:jobs/steps/*.xml"/>
+
+
+    <!--======================= Batch Job listAllTables =======================-->
+<!--    <batch:job id="queryExcelTemplate17">-->
+<!--        <batch:step id="Clone_Template_01" next="queryExcelTemplate_01" allow-start-if-complete="true">-->
+<!--            <batch:tasklet transaction-manager="transactionManager">-->
+<!--                <batch:chunk reader="readerCloneTemplate" writer="WriterNull" commit-interval="50"/>-->
+<!--            </batch:tasklet>-->
+<!--        </batch:step>-->
+<!--        <batch:step id="queryExcelTemplate_01" allow-start-if-complete="true">-->
+<!--            <batch:tasklet transaction-manager="transactionManager">-->
+<!--                <batch:chunk reader="readerGetTableConfig" writer="itemWriterMongoOutput"-->
+<!--                             processor="queryExcelTemplate_process" commit-interval="100"/>-->
+<!--            </batch:tasklet>-->
+<!--        </batch:step>-->
+<!--        <batch:listeners>-->
+<!--            <batch:listener ref="jobListenerItemLogsProgress"/>-->
+<!--        </batch:listeners>-->
+<!--    </batch:job>-->
+
+
+</beans>

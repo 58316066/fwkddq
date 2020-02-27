@@ -1,0 +1,31 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:batch="http://www.springframework.org/schema/batch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/batch
+		                http://www.springframework.org/schema/batch/spring-batch-3.0.xsd
+		                http://www.springframework.org/schema/beans 
+		                http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+    <batch:job id="examResultJob_2">
+        <batch:step id="step1" next="step2" allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="xmlItemReader" writer="databaseItemWriter"
+                             processor="itemProcessor" commit-interval="10"/>
+            </batch:tasklet>
+        </batch:step>
+        <batch:step id="step2" next="step3" allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="xmlItemReader" writer="databaseItemWriter"
+                             processor="itemProcessor" commit-interval="10"/>
+            </batch:tasklet>
+        </batch:step>
+        <batch:step id="step3" allow-start-if-complete="true">
+            <batch:tasklet transaction-manager="transactionManager">
+                <batch:chunk reader="xmlItemReader" writer="databaseItemWriter"
+                             processor="itemProcessor" commit-interval="10"/>
+            </batch:tasklet>
+        </batch:step>
+        <batch:listeners>
+            <batch:listener ref="jobListener"/>
+        </batch:listeners>
+    </batch:job>
+</beans>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <import resource="classpath:datasource/context-datasource.xml"/>
+
+    <bean id="jobRepository"
+          class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean">
+        <property name="dataSource" ref="dataSourceRepository"/>
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="databaseType" value="mysql"/>
+    </bean>
+
+    <bean id="defaultLobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler" lazy-init="true"/>
+
+    <bean id="jobExplorer" class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="lobHandler" ref="defaultLobHandler"/>
+    </bean>
+
+    <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+        <property name="jobRepository" ref="jobRepository"/>
+    </bean>
+
+    <!-- Optional JobExecutionListener to perform business logic before and after the job -->
+    <bean id="jobListener" class="com.gable.dos.ddq.controller.ExamResultJobListener"/>
+    <bean id="jobListeners" class="com.gable.dos.ddq.controller.itemReader.rowMapper.RowMapperAllTableDataSource"/>
+
+    <bean id="data-pep-listener" class="com.gable.dos.ddq.controller.itemReader.reader_csv_file"/>
+
+    <bean id="ProcessFilterAuditStructure"
+          class="com.gable.dos.ddq.controller.itemProcess.ProcessFilterAuditStructure"/>
+    <bean id="ProcessFilterAuditCountRecord"
+          class="com.gable.dos.ddq.controller.itemProcess.ProcessAuditCountRecord"/>
+    <bean id="jobListenerDimension"
+          class="com.gable.dos.ddq.controller.itemReader.ReadTableDimension"/>
+    <bean id="jobListenerItemLogsProgress" class="com.gable.dos.ddq.controller.itemProcess.ItemLogsProgress"/>
+    <bean id="jobListenerTestDataSource" class="com.gable.dos.ddq.controller.jobListenerTestDataSource"/>
+    <bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
+
+</beans>
